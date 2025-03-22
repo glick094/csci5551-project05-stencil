@@ -286,39 +286,47 @@ function distance(q1, q2) {
  * @returns {number[][]} - The path found.
  */
 function dfsPath() {
-    let path = [];
+    // Get the connecting vertices from both trees
+    let a_end = T_a.vertices[T_a.newest];
+    let b_end = T_b.vertices[T_b.newest];
     
-    // Trace path from connect_idx_a back to the root of T_a
-    let current_idx = connect_idx_a;
-    while (current_idx !== 0) { // 0 is the root index
-        path.unshift(T_a.vertices[current_idx]);
-        
-        // Find parent by checking edges (this assumes the parent is the first edge)
-        for (let i = 0; i < T_a.vertices.length; i++) {
-            if (T_a.vertices[i].edges.includes(T_a.vertices[current_idx])) {
-                current_idx = i;
-                break;
-            }
-        }
-    }
-    path.unshift(T_a.vertices[0]); // Add the root
+    // Get path from root of T_a to a_end
+    let a_path = [];
+    findPathToRoot(T_a, a_end, a_path);
+    a_path.reverse(); // To get path from root to end
     
-    // Trace path from connect_idx_b to the root of T_b
-    current_idx = connect_idx_b;
-    let reverse_path = [];
-    while (current_idx !== 0) { // 0 is the root index
-        reverse_path.push(T_b.vertices[current_idx]);
-        
-        // Find parent by checking edges
-        for (let i = 0; i < T_b.vertices.length; i++) {
-            if (T_b.vertices[i].edges.includes(T_b.vertices[current_idx])) {
-                current_idx = i;
-                break;
-            }
-        }
-    }
-    reverse_path.push(T_b.vertices[0]); // Add the root
+    // Get path from root of T_b to b_end
+    let b_path = [];
+    findPathToRoot(T_b, b_end, b_path);
     
     // Combine paths
-    return path.concat(reverse_path.reverse());
+    return a_path.concat(b_path);
+}
+
+function findPathToRoot(T, vertex, path) {
+    // Add this vertex to the path
+    path.push(vertex);
+    
+    // If this is the root node, we're done
+    if (vertex === T.vertices[0]) {
+        return;
+    }
+    
+    // Find a neighbor that is closer to the root
+    // We'll use the heuristic that lower indices are closer to the root
+    let bestEdge = null;
+    let bestIdx = Infinity;
+    
+    for (let i = 0; i < vertex.edges.length; i++) {
+        let edgeIdx = T.vertices.indexOf(vertex.edges[i]);
+        if (edgeIdx < bestIdx) {
+            bestEdge = vertex.edges[i];
+            bestIdx = edgeIdx;
+        }
+    }
+    
+    // Continue the path
+    if (bestEdge) {
+        findPathToRoot(T, bestEdge, path);
+    }
 }
