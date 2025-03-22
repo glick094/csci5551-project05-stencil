@@ -182,5 +182,50 @@ function traverse_collision_forward_kinematics_link(link,mstack,q) {
     return false;
 }
 
-
+function traverse_collision_forward_kinematics_joint(joint, mstack, q) {
+    // Create local transformation based on joint's origin
+    var local_xform = matrix_multiply(
+        mstack,
+        matrix_multiply(
+            generate_translation_matrix(joint.origin.xyz[0], joint.origin.xyz[1], joint.origin.xyz[2]),
+            matrix_multiply(
+                generate_rotation_matrix_Z(joint.origin.rpy[2]),
+                matrix_multiply(
+                    generate_rotation_matrix_Y(joint.origin.rpy[1]),
+                    generate_rotation_matrix_X(joint.origin.rpy[0])
+                )
+            )
+        )
+    );
+    
+    // Get joint's index in configuration array
+    var q_index = q_names[joint.name];
+    
+    // Apply joint's transformation based on type
+    var joint_xform;
+    if (joint.type === "prismatic") {
+        // Prismatic joints translate along their axis
+        joint_xform = generate_translation_matrix(
+            joint.axis[0] * q[q_index],
+            joint.axis[1] * q[q_index],
+            joint.axis[2] * q[q_index]
+        );
+    } else if (joint.type === "revolute" || joint.type === "continuous") {
+        // Revolute joints rotate around their axis
+        joint_xform = kineval.quaternionToRotationMatrix(
+            kineval.quaternionFromAxisAngle(joint.axis, q[q_index])
+        );
+    } else {
+        // Fixed joints don't move
+        joint_xform = generate_identity();
+    }
+    
+    // Combine transformations
+    var child_xform = matrix_multiply(local_xform, joint_xform);
+    
+    // Check child link for collisions
+    var collision = traverse_collision_forward_kinematics_link(robot.links[joint.child], child_xform, q);
+    
+    return collision;
+}
 
