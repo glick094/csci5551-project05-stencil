@@ -178,6 +178,29 @@ function newConfig(q_near, q) {
  * @returns {number[]} - The nearest neighbor to q in T
  */
 function findNearestNeighbor(T, q) {    
+    let minDist = Infinity;
+    let nearestIdx = -1;
+    
+    // Find the vertex in T with the minimum distance to q
+    for (let i = 0; i < T.vertices.length; i++) {
+        let q_near = T.vertices[i].vertex;
+        let dist = distance(q_near, q);
+        
+        if (dist < minDist) {
+            minDist = dist;
+            nearestIdx = i;
+        }
+    }
+    
+    return nearestIdx;
+}
+
+// Helper function to calculate Euclidean distance between two configurations
+function distance(q1, q2) {
+    return Math.sqrt(
+        Math.pow(q1[0] - q2[0], 2) + 
+        Math.pow(q1[1] - q2[1], 2)
+    );
 }
 
 /**
