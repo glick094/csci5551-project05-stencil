@@ -285,48 +285,86 @@ function distance(q1, q2) {
  * 
  * @returns {number[][]} - The path found.
  */
+// Find a path through the connected trees after they have been connected
 function dfsPath() {
-    // Get the connecting vertices from both trees
-    let a_end = T_a.vertices[T_a.newest];
-    let b_end = T_b.vertices[T_b.newest];
+    // Create arrays to store the vertices for the path
+    let pathA = []; // Path from start to connection point
+    let pathB = []; // Path from connection point to goal
     
-    // Get path from root of T_a to a_end
-    let a_path = [];
-    findPathToRoot(T_a, a_end, a_path);
-    a_path.reverse(); // To get path from root to end
+    // Reconstruct path from start to connection point in tree A
+    let currentIdxA = T_a.newest; // Index of connection point in tree A
+    while (currentIdxA >= 0) {
+        pathA.unshift(T_a.vertices[currentIdxA]); // Add to beginning of path
+        
+        // If we've reached the root of tree A, we're done
+        if (currentIdxA === 0) break;
+        
+        // Find the neighbor with smallest index (closest to root)
+        let minIdx = Infinity;
+        for (let i = 0; i < T_a.vertices[currentIdxA].edges.length; i++) {
+            let neighborIdx = T_a.vertices.indexOf(T_a.vertices[currentIdxA].edges[i]);
+            if (neighborIdx < currentIdxA && neighborIdx < minIdx) {
+                minIdx = neighborIdx;
+            }
+        }
+        
+        // If no smaller neighbor found, we're stuck
+        if (minIdx === Infinity) break;
+        
+        currentIdxA = minIdx;
+    }
     
-    // Get path from root of T_b to b_end
-    let b_path = [];
-    findPathToRoot(T_b, b_end, b_path);
+    // Reconstruct path from connection point to goal in tree B
+    let currentIdxB = T_b.newest; // Index of connection point in tree B
+    while (currentIdxB >= 0) {
+        pathB.push(T_b.vertices[currentIdxB]); // Add to end of path
+        
+        // If we've reached the root of tree B, we're done
+        if (currentIdxB === 0) break;
+        
+        // Find the neighbor with smallest index (closest to root)
+        let minIdx = Infinity;
+        for (let i = 0; i < T_b.vertices[currentIdxB].edges.length; i++) {
+            let neighborIdx = T_b.vertices.indexOf(T_b.vertices[currentIdxB].edges[i]);
+            if (neighborIdx < currentIdxB && neighborIdx < minIdx) {
+                minIdx = neighborIdx;
+            }
+        }
+        
+        // If no smaller neighbor found, we're stuck
+        if (minIdx === Infinity) break;
+        
+        currentIdxB = minIdx;
+    }
     
-    // Combine paths
-    return a_path.concat(b_path);
+    // Combine paths (path from start to goal)
+    return pathA.concat(pathB.slice(1)); // Slice to avoid duplicating connection point
 }
 
-function findPathToRoot(T, vertex, path) {
-    // Add this vertex to the path
-    path.push(vertex);
+// function findPathToRoot(T, vertex, path) {
+//     // Add this vertex to the path
+//     path.push(vertex);
     
-    // If this is the root node, we're done
-    if (vertex === T.vertices[0]) {
-        return;
-    }
+//     // If this is the root node, we're done
+//     if (vertex === T.vertices[0]) {
+//         return;
+//     }
     
-    // Find a neighbor that is closer to the root
-    // We'll use the heuristic that lower indices are closer to the root
-    let bestEdge = null;
-    let bestIdx = Infinity;
+//     // Find a neighbor that is closer to the root
+//     // We'll use the heuristic that lower indices are closer to the root
+//     let bestEdge = null;
+//     let bestIdx = Infinity;
     
-    for (let i = 0; i < vertex.edges.length; i++) {
-        let edgeIdx = T.vertices.indexOf(vertex.edges[i]);
-        if (edgeIdx < bestIdx) {
-            bestEdge = vertex.edges[i];
-            bestIdx = edgeIdx;
-        }
-    }
+//     for (let i = 0; i < vertex.edges.length; i++) {
+//         let edgeIdx = T.vertices.indexOf(vertex.edges[i]);
+//         if (edgeIdx < bestIdx) {
+//             bestEdge = vertex.edges[i];
+//             bestIdx = edgeIdx;
+//         }
+//     }
     
-    // Continue the path
-    if (bestEdge) {
-        findPathToRoot(T, bestEdge, path);
-    }
-}
+//     // Continue the path
+//     if (bestEdge) {
+//         findPathToRoot(T, bestEdge, path);
+//     }
+// }
