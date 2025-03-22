@@ -250,5 +250,39 @@ function distance(q1, q2) {
  * @returns {number[][]} - The path found.
  */
 function dfsPath() {
-
+    let path = [];
+    
+    // Trace path from connect_idx_a back to the root of T_a
+    let current_idx = connect_idx_a;
+    while (current_idx !== 0) { // 0 is the root index
+        path.unshift(T_a.vertices[current_idx]);
+        
+        // Find parent by checking edges (this assumes the parent is the first edge)
+        for (let i = 0; i < T_a.vertices.length; i++) {
+            if (T_a.vertices[i].edges.includes(T_a.vertices[current_idx])) {
+                current_idx = i;
+                break;
+            }
+        }
+    }
+    path.unshift(T_a.vertices[0]); // Add the root
+    
+    // Trace path from connect_idx_b to the root of T_b
+    current_idx = connect_idx_b;
+    let reverse_path = [];
+    while (current_idx !== 0) { // 0 is the root index
+        reverse_path.push(T_b.vertices[current_idx]);
+        
+        // Find parent by checking edges
+        for (let i = 0; i < T_b.vertices.length; i++) {
+            if (T_b.vertices[i].edges.includes(T_b.vertices[current_idx])) {
+                current_idx = i;
+                break;
+            }
+        }
+    }
+    reverse_path.push(T_b.vertices[0]); // Add the root
+    
+    // Combine paths
+    return path.concat(reverse_path.reverse());
 }
