@@ -165,6 +165,7 @@ function traverse_collision_forward_kinematics_link(link,mstack,q) {
         // if obstacle lies within link extents along all dimensions, a collision is detected and return true
         if (in_collision)
             return link.name;
+            // this returns the link name in collision. how does it put red bounding box on that link? 
     }
 
     // recurse child joints for collisions, returning true if child returns collision
