@@ -134,6 +134,28 @@ function iterateRRTStar() {
  *                     "extended" otherwise.
  */
 function extendRRT(T, q) {
+    // Find the nearest neighbor in T to q
+    let nearestIdx = findNearestNeighbor(T, q);
+    let q_near = T.vertices[nearestIdx].vertex;
+    
+    // Generate a new configuration by moving from q_near towards q
+    let q_new = newConfig(q_near, q);
+    
+    // Check if the path to q_new is collision-free
+    if (!testCollision(q_new)) {
+        // Add the new vertex and edge to the tree
+        insertTreeVertex(T, q_new);
+        insertTreeEdge(T, nearestIdx, T.newest);
+        
+        // Check if we've reached q
+        if (distance(q_new, q) < eps) {
+            return "reached";
+        } else {
+            return "advanced";
+        }
+    }
+    
+    return "trapped";
 }
 
 /**
