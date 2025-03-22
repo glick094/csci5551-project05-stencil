@@ -97,6 +97,42 @@ function iterateRRTConnect() {
     //   insertTreeVertex - adds and displays new configuration vertex for a tree
     //   insertTreeEdge - adds and displays new tree edge between configurations
     //   drawHighlightedPath - renders a highlighted path in a tree
+
+    // Generate a random configuration
+    let q_rand = randomConfig();
+
+    // Extend the first tree towards the random configuration
+    let extend_result = extendRRT(T_a, q_rand);
+    
+    if (extend_result !== "trapped") {
+        // Try to connect the second tree to the new point in the first tree
+        let q_new = T_a.vertices[T_a.newest].vertex;
+        let connect_result = connectRRT(T_b, q_new);
+        
+        if (connect_result === "reached") {
+            // We've successfully connected the trees!
+            search_iterate = false;
+            
+            // Find the connecting vertices in both trees
+            let connect_idx_a = T_a.newest;
+            let connect_idx_b = T_b.newest;
+            
+            // Generate the path
+            rrt_path = dfsPath(T_a, T_b, connect_idx_a, connect_idx_b);
+            
+            // Visualize the path
+            drawHighlightedPath(rrt_path);
+            
+            return "succeeded";
+        }
+    }
+    
+    // Swap the trees for the next iteration
+    let temp = T_a;
+    T_a = T_b;
+    T_b = temp;
+    
+    return "extended";
 }
 
 /**
