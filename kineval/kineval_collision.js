@@ -59,7 +59,7 @@ kineval.poseIsCollision = function robot_collision_test(q) {
 
     // traverse robot kinematics to test each body for collision
     // STENCIL: implement forward kinematics for collision detection
-    //return robot_collision_forward_kinematics(q); // TODO UNCOMMENT THIS LINE PROJECT 5
+    return robot_collision_forward_kinematics(q); // TODO UNCOMMENT THIS LINE PROJECT 5
 
 }
 
@@ -73,7 +73,33 @@ kineval.poseIsCollision = function robot_collision_test(q) {
  */
 
 function robot_collision_forward_kinematics(q) {
+    // Create a transformation matrix for the robot's base
+    var robot_base_xform = matrix_multiply(
+        generate_translation_matrix(q[0], q[1], q[2]), 
+        matrix_multiply(
+            generate_rotation_matrix_Z(q[5]),
+            matrix_multiply(
+                generate_rotation_matrix_Y(q[4]),
+                generate_rotation_matrix_X(q[3])
+            )
+        )
+    );
     
+    // If using ROS coordinates, convert base frame
+    if (typeof robot.links_geom_imported !== 'undefined') {
+        robot_base_xform = matrix_multiply(
+            robot_base_xform,
+            [
+                [0, 1, 0, 0],
+                [0, 0, 1, 0],
+                [1, 0, 0, 0],
+                [0, 0, 0, 1]
+            ]
+        );
+    }
+    
+    // Start traversal from the base link
+    return traverse_collision_forward_kinematics_link(robot.links[robot.base], robot_base_xform, q);
 }
 
 
