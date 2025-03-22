@@ -168,6 +168,12 @@ function extendRRT(T, q) {
  *                     "extended" otherwise.
  */
 function connectRRT(T, q) {
+    let result;
+    do {
+        result = extendRRT(T, q);
+    } while (result === "advanced");
+    
+    return result;
 }
 
 /**
