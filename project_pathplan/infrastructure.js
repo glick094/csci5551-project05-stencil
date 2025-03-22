@@ -213,12 +213,12 @@ function init() {
 function initSearch() {
 
     // specify default search algorithm to use for planning
-    search_alg = "depth-first";
+    // search_alg = "depth-first";
     //search_alg = "breadth-first";
     //search_alg = "greedy-best-first";
     // search_alg = "A-star";
     //search_alg = "RRT";
-    // search_alg = "RRT-connect";
+    search_alg = "RRT-connect";
     //search_alg = "RRT-star";
 
     // specify default the world for the planner
