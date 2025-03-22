@@ -169,6 +169,19 @@ function randomConfig() {
  * @returns {number[]} - The new configuration
  */
 function newConfig(q_near, q) {
+    // Check if the distance between q_near and q is less than eps
+    let d = distance(q_near, q);
+
+    if (d < eps) {
+        return q; // Return q if it's already close enough
+    } else {
+        // Move from q_near towards q by distance eps
+        let scale = eps / d;
+        return [
+            q_near[0] + (q[0] - q_near[0]) * scale,
+            q_near[1] + (q[1] - q_near[1]) * scale
+        ];
+    }
 }
 
 /**
