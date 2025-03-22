@@ -153,6 +153,12 @@ function connectRRT(T, q) {
  * @returns {number[]} - The random configuration
  */
 function randomConfig() {
+    // Generate a random configuration in the 2D space
+    // The range for our world is approximately [-1.8, 5.8] in both x and y
+    return [
+        Math.random() * 7.6 - 1.8,  // x between -1.8 and 5.8
+        Math.random() * 7.6 - 1.8   // y between -1.8 and 5.8
+    ];
 }
 
 
